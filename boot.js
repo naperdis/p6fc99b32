@@ -11,20 +11,20 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&
 const G = {on: true, mode: "load", err: "", wait: false, name: "", pin: "", code: ""};
 const GERR = {exists: "Команда уже создана. Войдите по имени и ПИНу или по коду-приглашению.", invite: "Код-приглашение не подошёл.", taken: "Такое имя в команде уже есть. Выберите другое.", pin: "ПИН слишком короткий: нужно от 6 знаков.", name: "Введите имя.", no_team: "Команды ещё нет: её создаёт первый вошедший.", user: "Не получилось создать вход. Попробуйте другое имя."};
 
-async function loginOf(name) {
-  const h = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(name.trim().toLowerCase())));
-  return "u" + Array.from(h.slice(0, 12)).map(b => b.toString(16).padStart(2, "0")).join("") + "@members.planner-app.dev";
-}
 async function gate(body) {
   const {data} = await sb.auth.getSession(), h = {apikey: CFG.key, "Content-Type": "application/json"};
   if (data.session) h.Authorization = "Bearer " + data.session.access_token;
   const r = await fetch(CFG.url + "/functions/v1/gate", {method: "POST", headers: h, body: JSON.stringify(body)});
   return Object.assign({status: r.status}, await r.json().catch(() => ({})));
 }
+/* вход идёт только через сервер: он считает неверные попытки и блокирует перебор */
 async function enter(name, pin) {
-  const {error} = await sb.auth.signInWithPassword({email: await loginOf(name), password: pin});
-  return !error;
+  const r = await gate({action: "login", name, pin});
+  if (!r.ok || !r.session) return r;
+  const {error} = await sb.auth.setSession(r.session);
+  return error ? {error: "session"} : {ok: true};
 }
+const LOCKED = m => `Слишком много неверных попыток. Попробуйте через ${m || 10} мин.`;
 
 function drawGate() {
   const v = k => esc(G[k] || ""), view = $("view");
@@ -71,9 +71,10 @@ async function submitGate() {
   try {
     if (G.mode !== "login") {
       const r = await gate(G.mode === "create" ? {action: "create", name: nm, pin} : {action: "join", name: nm, pin, invite: code});
-      if (!r.ok) { G.wait = false; G.err = GERR[r.error] || "Не получилось. Попробуйте ещё раз."; if (r.error === "exists") G.mode = "login"; return drawGate(); }
+      if (!r.ok) { G.wait = false; G.err = r.error === "locked" ? LOCKED(r.minutes) : GERR[r.error] || "Не получилось. Попробуйте ещё раз."; if (r.error === "exists") G.mode = "login"; return drawGate(); }
     }
-    if (!(await enter(nm, pin))) { G.wait = false; G.err = "Имя или ПИН не подошли."; return drawGate(); }
+    const e = await enter(nm, pin);
+    if (!e.ok) { G.wait = false; G.err = e.error === "locked" ? LOCKED(e.minutes) : e.error === "bad" ? "Имя или ПИН не подошли." + (e.left ? ` Осталось попыток: ${e.left}.` : "") : "Не получилось войти. Попробуйте ещё раз."; return drawGate(); }
     G.pin = ""; G.wait = false; G.mode = "load"; drawGate(); await loadApp();
   } catch (e) { console.error(e); G.wait = false; G.err = "Нет связи с сервером. Проверьте интернет."; drawGate(); }
 }
