@@ -11,6 +11,15 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&
 const G = {on: true, mode: "load", err: "", wait: false, name: "", pin: "", code: ""};
 const GERR = {exists: "Команда уже создана. Войдите по имени и ПИНу или по коду-приглашению.", invite: "Код-приглашение не подошёл.", taken: "Такое имя в команде уже есть. Выберите другое.", pin: "ПИН слишком короткий: нужно от 6 знаков.", name: "Введите имя.", no_team: "Команды ещё нет: её создаёт первый вошедший.", user: "Не получилось создать вход. Попробуйте другое имя."};
 
+/* заставка: видна с первой отрисовки страницы и не короче 0,6 с, чтобы не мелькала */
+const T0 = performance.now();
+function splash(on) {
+  const el = $("splash"); if (!el) return;
+  if (on) { clearTimeout(splash.t); el.hidden = false; el.classList.remove("off"); return; }
+  if (el.hidden || el.classList.contains("off")) return;
+  clearTimeout(splash.t);
+  splash.t = setTimeout(() => { el.classList.add("off"); splash.t = setTimeout(() => { el.hidden = true; }, 360); }, Math.max(0, 600 - (performance.now() - T0)));
+}
 async function gate(body) {
   const {data} = await sb.auth.getSession(), h = {apikey: CFG.key, "Content-Type": "application/json"};
   if (data.session) h.Authorization = "Bearer " + data.session.access_token;
@@ -34,8 +43,9 @@ function drawGate() {
   const err = G.err ? `<div class="sub" style="color:var(--hub-alert)" role="alert">${esc(G.err)}</div>` : "";
   const btn = t => `<button class="pill wide" data-g="submit"${G.wait ? " disabled" : ""}>${G.wait ? "Секунду…" : t}</button>`;
   let h;
-  /* загрузка: очертания первого экрана вместо слова «Загрузка» */
-  if (G.mode === "load") { view.innerHTML = `<div class="boot" role="status" aria-label="Загрузка"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><div class="b5"><i></i><i></i><i></i></div></div>`; view.className = "notab"; $("tab").innerHTML = ""; $("layer").innerHTML = ""; $("idea").innerHTML = ""; return; }
+  /* загрузка: заставка поверх экрана, пока идёт вход и подгружается приложение */
+  if (G.mode === "load") { splash(true); view.innerHTML = ""; view.className = "notab"; $("tab").innerHTML = ""; $("layer").innerHTML = ""; $("idea").innerHTML = ""; return; }
+  splash(false);
   if (G.mode === "offline") h = `<div class="t32">Нет связи</div><div class="sub" style="font-size:15px">Не получилось связаться с сервером. Проверьте интернет и попробуйте ещё раз.</div><button class="pill wide" data-g="retry">Повторить</button>`;
   else if (G.mode === "create") h = `<div class="t32">Новая команда</div><div class="sub" style="font-size:15px">Вы здесь первый. Задайте имя и ПИН: по ним вы будете входить с любого устройства. Остальных пригласите кодом из настроек.</div>${nameF}${pinF("ПИН, от 6 знаков")}${err}${btn("Создать")}`;
   else if (G.mode === "join") h = `<div class="t32">По приглашению</div><div class="sub" style="font-size:15px">Введите код, который вам дали, и придумайте себе имя и ПИН.</div>${f("gcode", "Код-приглашение", v("code"), 'maxlength="12" autocomplete="off" autocapitalize="characters"')}${nameF}${pinF("Придумайте ПИН, от 6 знаков")}${err}${btn("Войти в команду")}<button class="link" data-g="login">У меня уже есть имя и ПИН</button>`;
