@@ -55,7 +55,7 @@ async function loadApp() {
   if (window.__app) return start();   /* код уже загружен: просто входим заново */
   let code;
   try {
-    if (DEV) code = await Promise.all(["core.js", "ui.js", "actions.js"].map(f => fetch("../src/" + f, {cache: "no-store"}).then(r => { if (!r.ok) throw new Error(f); return r.text(); })));
+    if (DEV) code = await Promise.all(["core.js", "ui.js", "brandkit.js", "studio.js", "actions.js"].map(f => fetch("../src/" + f, {cache: "no-store"}).then(r => { if (!r.ok) throw new Error(f); return r.text(); })));
     else { const {data, error} = await sb.storage.from("app").download("bundle.js"); if (error) throw error; code = [await data.text()]; }
   } catch (e) { console.error(e); return showGate("offline"); }
   window.__app = true;
