@@ -415,6 +415,34 @@ button.mc{background:var(--hub-surf)}
 .mc.now b{color:var(--hub-blue)}
 .mc .mk.e{border:1.5px solid var(--hub-line)}
 #sq{margin-bottom:4px}
+/* план расписанием */
+.pgs{display:flex;flex-direction:column;gap:8px}
+.pg{display:grid;grid-template-columns:58px minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:12px;color:var(--hub-t2)}
+.pg b{font:500 14px var(--hub-txt);color:var(--hub-t1)}
+.pg .zero{color:var(--hub-alert)}
+.segs{display:flex;gap:2px;min-width:0}
+.segs i{flex:1;height:10px;border-radius:3px;background:var(--hub-surf-2)}
+.segs i.sg1,.lg i.sg1{background:#C5CEFF}
+.segs i.sg2,.lg i.sg2{background:#7B8CFF}
+.segs i.sg3,.lg i.sg3{background:var(--hub-blue)}
+.segs i.sg4,.lg i.sg4{background:var(--hub-ink)}
+.lg{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;font-size:11px;color:var(--hub-t3)}
+.lg span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.lg i{width:8px;height:8px;border-radius:2px;flex:none}
+.lg .vw{margin-left:auto}
+div.wdh{padding-top:9px}
+.dline{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
+.dmk{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--hub-t3)}
+.dmk em{font-style:normal;margin-right:1px}
+.dmk em:not(:first-child){margin-left:10px}
+.dmk .mk{width:11px;height:11px}
+.dmk .mk.s2{box-shadow:inset 5.5px 0 0 var(--hub-ink)}
+.dmk .mk.al{border-color:var(--hub-alert)}
+.dmk .mk.s2.al{box-shadow:inset 5.5px 0 0 var(--hub-alert)}
+.dmk .mk.s3.al{background:var(--hub-alert)}
+.dadd{width:34px;height:34px;border-radius:50%;background:var(--hub-surf);font-size:20px;line-height:1;color:var(--hub-t1);display:grid;place-items:center;flex:none}
+.dadd::after{content:"";position:absolute;inset:-6px}
+.wd.past .dmk{opacity:.7}
 /* профиль: серия, вклад, карта активности, достижения */
 button.who{display:flex;align-items:center;gap:12px;text-align:left}
 .strk{display:inline-flex;align-items:center;gap:2px;margin-left:2px;padding:4px 9px 4px 6px;border-radius:999px;background:var(--hub-surf);font:500 13px var(--hub-txt);color:var(--hub-t1)}
