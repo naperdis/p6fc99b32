@@ -34,8 +34,9 @@ function drawGate() {
   const err = G.err ? `<div class="sub" style="color:var(--hub-alert)" role="alert">${esc(G.err)}</div>` : "";
   const btn = t => `<button class="pill wide" data-g="submit"${G.wait ? " disabled" : ""}>${G.wait ? "Секунду…" : t}</button>`;
   let h;
-  if (G.mode === "load") h = `<div class="t22">Загрузка…</div>`;
-  else if (G.mode === "offline") h = `<div class="t32">Нет связи</div><div class="sub" style="font-size:15px">Не получилось связаться с сервером. Проверьте интернет и попробуйте ещё раз.</div><button class="pill wide" data-g="retry">Повторить</button>`;
+  /* загрузка: очертания первого экрана вместо слова «Загрузка» */
+  if (G.mode === "load") { view.innerHTML = `<div class="boot" role="status" aria-label="Загрузка"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><div class="b5"><i></i><i></i><i></i></div></div>`; view.className = "notab"; $("tab").innerHTML = ""; $("layer").innerHTML = ""; $("idea").innerHTML = ""; return; }
+  if (G.mode === "offline") h = `<div class="t32">Нет связи</div><div class="sub" style="font-size:15px">Не получилось связаться с сервером. Проверьте интернет и попробуйте ещё раз.</div><button class="pill wide" data-g="retry">Повторить</button>`;
   else if (G.mode === "create") h = `<div class="t32">Новая команда</div><div class="sub" style="font-size:15px">Вы здесь первый. Задайте имя и ПИН: по ним вы будете входить с любого устройства. Остальных пригласите кодом из настроек.</div>${nameF}${pinF("ПИН, от 6 знаков")}${err}${btn("Создать")}`;
   else if (G.mode === "join") h = `<div class="t32">По приглашению</div><div class="sub" style="font-size:15px">Введите код, который вам дали, и придумайте себе имя и ПИН.</div>${f("gcode", "Код-приглашение", v("code"), 'maxlength="12" autocomplete="off" autocapitalize="characters"')}${nameF}${pinF("Придумайте ПИН, от 6 знаков")}${err}${btn("Войти в команду")}<button class="link" data-g="login">У меня уже есть имя и ПИН</button>`;
   else h = `<div class="t32">Вход</div>${nameF}${pinF("ПИН")}${err}${btn("Войти")}<button class="link" data-g="join">У меня код-приглашение</button>`;
