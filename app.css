@@ -340,6 +340,8 @@ html,body{height:100%}
 body{margin:0;padding:0;min-height:100dvh;display:flex;align-items:center;justify-content:center;gap:0;background:#E7E9EF}
 .ph{padding-top:18px}
 a{color:var(--hub-blue)}
+/* невидимая зона нажатия (::after) всегда привязана к своему элементу, а не к экрану: иначе она перекрывает всё вокруг */
+#ph a,#ph .edit,#ph .link,#ph .pill{position:relative}
 .inp,.urlrow input{box-sizing:border-box;width:100%;border:0;background:var(--hub-surf);border-radius:var(--hub-r-tile);padding:14px 16px;font:400 16px/1.4 var(--hub-txt);color:var(--hub-t1);min-width:0}
 .inp:focus,.urlrow input:focus{outline:2px solid var(--hub-ink);outline-offset:0}
 .stories{row-gap:16px}
@@ -360,7 +362,7 @@ a{color:var(--hub-blue)}
 .wd{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding:6px 0;border-top:1px solid var(--hub-line)}
 .wd:last-child{border-bottom:1px solid var(--hub-line)}
 .wdh{display:flex;flex-direction:column;align-items:center;align-self:start;gap:1px;padding-top:6px}
-.wdh::after{content:"";position:absolute;inset:-4px -8px}
+button.wdh::after{content:"";position:absolute;inset:-4px -8px}
 .wdh small{font-size:11px;color:var(--hub-t3)}
 .wdh b{font:500 16px var(--hub-txt)}
 .wd.past .wdh b{color:var(--hub-t3)}
@@ -415,6 +417,17 @@ button.mc{background:var(--hub-surf)}
 .mc.now b{color:var(--hub-blue)}
 .mc .mk.e{border:1.5px solid var(--hub-line)}
 #sq{margin-bottom:4px}
+/* план списком, как заметки */
+.nlist{display:flex;flex-direction:column;gap:26px}
+.nh{display:flex;align-items:center;justify-content:space-between;min-height:36px;margin-bottom:2px}
+.nh b{font:500 13px var(--hub-txt);letter-spacing:.06em;color:var(--hub-t2)}
+.nday.now .nh b{color:var(--hub-blue)}
+.nrow{display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:12px;align-items:baseline;width:100%;text-align:left;padding:9px 0}
+.nk{font-size:14px;color:var(--hub-t3)}
+.nt{font:400 16px/1.3 var(--hub-txt);color:var(--hub-t1);overflow-wrap:anywhere}
+.ns{font-size:14px;color:var(--hub-t2);white-space:nowrap}
+.ns.al{color:var(--hub-alert)}
+.nempty{font-size:14px;color:var(--hub-t3);padding:9px 0}
 /* план расписанием */
 .pgs{display:flex;flex-direction:column;gap:8px}
 .pg{display:grid;grid-template-columns:58px minmax(0,1fr) auto auto;gap:10px;align-items:center;font-size:12px;color:var(--hub-t2)}
